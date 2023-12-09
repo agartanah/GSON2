@@ -1,10 +1,17 @@
 package com.bignerdranch.android.gson2
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
+import android.net.Uri
 import android.os.Bundle
+import android.view.View
+import android.widget.LinearLayout
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
 import okhttp3.Call
 import okhttp3.Callback
@@ -13,7 +20,7 @@ import okhttp3.Request
 import okhttp3.Response
 import timber.log.Timber
 import java.io.IOException
-import java.sql.Wrapper
+
 
 interface  CellClickListener {
     fun onCellClickListener (link: String)
@@ -36,11 +43,38 @@ class MainActivity : AppCompatActivity(), CellClickListener {
 
     private lateinit var recyclerView: RecyclerView
 
+    private lateinit var linearLayout: LinearLayout
+
     private val okHttpClient : OkHttpClient = OkHttpClient()
+
+    private var launcher: ActivityResultLauncher<Intent>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        launcher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            result: ActivityResult ->
+            if (result.resultCode == RESULT_OK) {
+                val link = result.data?.getStringExtra("link")
+
+                Timber.tag("MainActivity").d("TUT")
+
+                Timber.tag("MainActivity").d(link.toString())
+
+                linearLayout = findViewById(R.id.activity_main)
+
+                val snackbar = Snackbar.make(
+                    linearLayout,
+                    "Картинка добавлена в избранное",
+                    Snackbar.LENGTH_LONG)
+                    .setAction("Открыть", View.OnClickListener {
+                        val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(link))
+                        startActivity(browserIntent)
+                    })
+                    .show()
+            }
+        }
 
         recyclerView = findViewById(R.id.rView)
 
@@ -86,6 +120,6 @@ class MainActivity : AppCompatActivity(), CellClickListener {
     override fun onCellClickListener(link: String) {
         val intent = Intent(this, PicActivity::class.java)
         intent.putExtra(R.string.key_link.toString(), link)
-        startActivity(intent)
+        launcher?.launch(intent)
     }
 }
