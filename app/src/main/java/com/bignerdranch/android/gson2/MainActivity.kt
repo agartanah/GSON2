@@ -122,4 +122,31 @@ class MainActivity : AppCompatActivity(), CellClickListener {
         intent.putExtra(R.string.key_link.toString(), link)
         launcher?.launch(intent)
     }
+
+    @Deprecated("Deprecated in Java")
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (data == null) {
+            return
+        }
+
+        val link = data.getStringExtra("link")
+
+        Timber.tag("MainActivity").d("TUT")
+
+        Timber.tag("MainActivity").d(link.toString())
+
+        linearLayout = findViewById(R.id.activity_main)
+
+        val snackbar = Snackbar.make(
+            linearLayout,
+            "Картинка добавлена в избранное",
+            Snackbar.LENGTH_LONG)
+            .setAction("Открыть", View.OnClickListener {
+                val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(link))
+                startActivity(browserIntent)
+            })
+            .show()
+
+        super.onActivityResult(requestCode, resultCode, data)
+    }
 }

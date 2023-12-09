@@ -3,7 +3,6 @@ package com.bignerdranch.android.gson2
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -33,12 +32,9 @@ class PicActivity : AppCompatActivity() {
         toolBar = findViewById(R.id.toolbar)
         setSupportActionBar(toolBar)
 
-        val link = intent.getStringExtra("link")
-        Timber.tag("PicActivity").d(link.toString())
+        link = intent.getStringExtra(R.string.key_link.toString())
 
         pic = findViewById(R.id.imageView)
-
-        Timber.plant(Timber.DebugTree())
 
         Glide.with(this).load(link).into(pic)
     }
@@ -46,7 +42,6 @@ class PicActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == R.id.heart_item) {
             val intent = Intent()
-            Timber.tag("PicActivity").d(link);
             intent.putExtra("link", link)
             setResult(RESULT_OK, intent)
             finish()
